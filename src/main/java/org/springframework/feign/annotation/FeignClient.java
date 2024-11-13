@@ -31,6 +31,8 @@ public @interface FeignClient {
 
 	Level level() default Level.WARN;
 
+	boolean suppressError() default false;
+
 	String name() default "";
 
 	Class<?> encoder() default EJacksonEncoder.class;

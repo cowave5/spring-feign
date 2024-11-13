@@ -52,7 +52,7 @@ public class FeignFactory<T> implements FactoryBean<T>, EmbeddedValueResolverAwa
         FeignClient feign = AnnotationUtils.getAnnotation(feignClass, FeignClient.class);
         assert feign != null;
         FeignBuilder builder = FeignManager.builder(feign);
-        return builder.target(feignClass, feign.url(), feign.name(), applicationContext, valueResolver, feign.level());
+        return builder.target(feignClass, feign.url(), feign.name(), applicationContext, valueResolver, feign.level(), feign.suppressError());
     }
 
     @Override

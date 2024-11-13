@@ -193,14 +193,14 @@ public class Types {
                 Class<?> original = (Class<?>) toResolve;
                 Type componentType = original.getComponentType();
                 Type newComponentType = resolve(context, contextRawType, componentType);
-                return componentType == newComponentType ? original : new Types.GenericArrayTypeImpl(
+                return componentType == newComponentType ? original : new GenericArrayTypeImpl(
                         newComponentType);
 
             } else if (toResolve instanceof GenericArrayType) {
                 GenericArrayType original = (GenericArrayType) toResolve;
                 Type componentType = original.getGenericComponentType();
                 Type newComponentType = resolve(context, contextRawType, componentType);
-                return componentType == newComponentType ? original : new Types.GenericArrayTypeImpl(
+                return componentType == newComponentType ? original : new GenericArrayTypeImpl(
                         newComponentType);
 
             } else if (toResolve instanceof ParameterizedType) {
@@ -222,7 +222,7 @@ public class Types {
                 }
 
                 return changed
-                        ? new Types.ParameterizedTypeImpl(newOwnerType, original.getRawType(), args)
+                        ? new ParameterizedTypeImpl(newOwnerType, original.getRawType(), args)
                         : original;
 
             } else if (toResolve instanceof WildcardType) {
@@ -233,12 +233,12 @@ public class Types {
                 if (originalLowerBound.length == 1) {
                     Type lowerBound = resolve(context, contextRawType, originalLowerBound[0]);
                     if (lowerBound != originalLowerBound[0]) {
-                        return new Types.WildcardTypeImpl(new Type[]{Object.class}, new Type[]{lowerBound});
+                        return new WildcardTypeImpl(new Type[]{Object.class}, new Type[]{lowerBound});
                     }
                 } else if (originalUpperBound.length == 1) {
                     Type upperBound = resolve(context, contextRawType, originalUpperBound[0]);
                     if (upperBound != originalUpperBound[0]) {
-                        return new Types.WildcardTypeImpl(new Type[]{upperBound}, EMPTY_TYPE_ARRAY);
+                        return new WildcardTypeImpl(new Type[]{upperBound}, EMPTY_TYPE_ARRAY);
                     }
                 }
                 return original;

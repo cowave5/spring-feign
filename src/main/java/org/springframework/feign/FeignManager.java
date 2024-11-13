@@ -60,13 +60,13 @@ public class FeignManager {
         FeignClient feign = AnnotationUtils.getAnnotation(clazz, FeignClient.class);
         Assert.notNull(feign, clazz + " is not a FeignClient");
         return builder(feign, new Request.Options(connectTimeoutMillis, readTimeoutMillis))
-                .target(clazz, url, null, applicationContext, valueResolver, feign.level());
+                .target(clazz, url, null, applicationContext, valueResolver, feign.level(), feign.suppressError());
     }
 
     public static <T> T get(Class<T> clazz, String url) {
         FeignClient feign = AnnotationUtils.getAnnotation(clazz, FeignClient.class);
         Assert.notNull(feign, clazz + " is not a FeignClient");
-        return builder(feign).target(clazz, url, null, applicationContext, valueResolver, feign.level());
+        return builder(feign).target(clazz, url, null, applicationContext, valueResolver, feign.level(), feign.suppressError());
     }
 
     @SuppressWarnings("unchecked")
@@ -80,7 +80,7 @@ public class FeignManager {
             return exist;
         }
         return (T) localFeigns.computeIfAbsent(key,
-                k -> builder(feign).target(clazz, url, null, applicationContext, valueResolver, feign.level()));
+                k -> builder(feign).target(clazz, url, null, applicationContext, valueResolver, feign.level(), feign.suppressError()));
     }
 
     static FeignBuilder builder(FeignClient feign) {

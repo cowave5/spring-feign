@@ -32,7 +32,6 @@ import java.util.concurrent.TimeUnit;
 
 import static com.cowave.commons.response.HttpResponseCode.SERVICE_ERROR;
 import static feign.Util.checkNotNull;
-import static java.lang.String.format;
 import static org.slf4j.event.Level.WARN;
 
 /**
@@ -52,6 +51,7 @@ public class FeignSyncInvoker implements InvocationHandlerFactory.MethodHandler 
         RESPONSE_MAPEER.setTimeZone(TimeZone.getDefault());
     }
     private final Level level;
+    private final boolean errorSuppress;
     private final FeignMethodMetadata metadata;
     private final Target<?> target;
     private final Client client;
@@ -70,6 +70,7 @@ public class FeignSyncInvoker implements InvocationHandlerFactory.MethodHandler 
                             Request.Options options,
                             FeignDecoder decoder,
                             Level level,
+                            boolean errorSuppress,
                             FeignExceptionHandler exceptionHandler) {
         this.target = checkNotNull(target, "target");
         this.client = checkNotNull(client, "client for %s", target);
@@ -80,6 +81,7 @@ public class FeignSyncInvoker implements InvocationHandlerFactory.MethodHandler 
         this.options = checkNotNull(options, "options for %s", target);
         this.decoder = checkNotNull(decoder, "decoder for %s", target);
         this.level = level;
+        this.errorSuppress = errorSuppress;
         this.exceptionHandler = exceptionHandler;
     }
 
@@ -110,7 +112,7 @@ public class FeignSyncInvoker implements InvocationHandlerFactory.MethodHandler 
         } catch (IOException e){
             long cost = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
             LOGGER.error(">< {}ms {} {}", cost, e.getMessage(), url);
-            throw new HttpHintException("{frame.remote.failed}");
+            return throwOrReturn(httpType, new HttpHintException("{frame.remote.failed}"));
         }
 
         long cost = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
@@ -149,11 +151,20 @@ public class FeignSyncInvoker implements InvocationHandlerFactory.MethodHandler 
             if(exceptionHandler != null){
                 exceptionHandler.handle(e);
             }
-            throw e;
-        } catch (IOException e) {
+            return throwOrReturn(httpType, e);
+        } catch (Exception e) {
             LOGGER.error(">< {}ms {} {}", cost, e.getMessage(), url);
-            throw new HttpHintException("{frame.remote.failed}");
+            return throwOrReturn(httpType, new HttpHintException("{frame.remote.failed}", e));
         }
+    }
+
+    private Object throwOrReturn(Type httpType, Exception exception) throws Throwable {
+        if (errorSuppress && httpType != null) {
+            HttpResponse<?> httpResponse = new HttpResponse<>(SERVICE_ERROR);
+            httpResponse.setCause(exception);
+            return httpResponse;
+        }
+        throw exception;
     }
 
     private HttpResponse<?> parseHttpResponse(Type paramType, Response response, int status, String url, long cost) throws IOException {

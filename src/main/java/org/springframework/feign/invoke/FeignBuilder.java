@@ -76,19 +76,19 @@ public class FeignBuilder {
     }
 
     public <T> T target(Class<T> apiType, String url, String name,
-                        ApplicationContext applicationContext, StringValueResolver valueResolver, Level level) {
-        return target(new FeignTarget<>(apiType, name, url, applicationContext, valueResolver), level);
+                        ApplicationContext applicationContext, StringValueResolver valueResolver, Level level, boolean errorSuppress) {
+        return target(new FeignTarget<>(apiType, name, url, applicationContext, valueResolver), level, errorSuppress);
     }
 
-    public <T> T target(Target<T> target, Level level) {
-        return build(level).newInstance(target);
+    public <T> T target(Target<T> target, Level level, boolean errorSuppress) {
+        return build(level, errorSuppress).newInstance(target);
     }
 
-    public Feign build(Level level) {
+    public Feign build(Level level, boolean errorSuppress) {
         FeignMethodHandlerFactory methodHandlerFactory =
                 new FeignMethodHandlerFactory(client, retryer, requestInterceptors, exceptionHandler);
         FeignParseHandlersByName parseHandlersByName =
-                new FeignParseHandlersByName(contract, options, encoder, decoder, methodHandlerFactory, level);
+                new FeignParseHandlersByName(contract, options, encoder, decoder, methodHandlerFactory, level, errorSuppress);
         return new FeignImplement(parseHandlersByName, invocationHandlerFactory);
     }
 }

@@ -31,15 +31,17 @@ public class FeignParseHandlersByName {
     private final Encoder encoder;
     private final FeignDecoder decoder;
     private final FeignMethodHandlerFactory factory;
+    private final boolean errorSuppress;
     private Level level;
 
     FeignParseHandlersByName(FeignContract contract, Request.Options options, Encoder encoder, FeignDecoder decoder,
-                        FeignMethodHandlerFactory factory, Level level) {
+                        FeignMethodHandlerFactory factory, Level level, boolean errorSuppress) {
         this.contract = contract;
         this.options = options;
         this.factory = factory;
         this.encoder = checkNotNull(encoder, "encoder");
         this.decoder = checkNotNull(decoder, "decoder");
+        this.errorSuppress = errorSuppress;
         this.level = level;
     }
 
@@ -48,7 +50,7 @@ public class FeignParseHandlersByName {
         Map<String, InvocationHandlerFactory.MethodHandler> result = new LinkedHashMap<>();
         for (FeignMethodMetadata meta : metaList) {
             FeignRequestFactory feignRequestFactory;
-            if(meta.multipartFileIndex() != null){
+            if(meta.multipartFileIndex() != null || meta.multipartFormIndex() != null){
                 // multipart/form-data
                 feignRequestFactory = new FeignMultipartRequestFactory(meta);
             } else if (!meta.formParams().isEmpty() && meta.template().bodyTemplate() == null) {
@@ -60,7 +62,7 @@ public class FeignParseHandlersByName {
             } else {
                 feignRequestFactory = new FeignRequestFactory(meta);
             }
-            result.put(meta.configKey(), factory.create(key, meta, feignRequestFactory, options, decoder, level));
+            result.put(meta.configKey(), factory.create(key, meta, feignRequestFactory, options, decoder, level, errorSuppress));
         }
         return result;
     }

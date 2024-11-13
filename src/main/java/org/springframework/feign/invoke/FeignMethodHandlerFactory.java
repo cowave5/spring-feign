@@ -32,8 +32,9 @@ public class FeignMethodHandlerFactory {
     }
 
     public InvocationHandlerFactory.MethodHandler create(Target<?> target, FeignMethodMetadata md,
-                                                         FeignRequestFactory buildTemplateFromArgs, Request.Options options, FeignDecoder decoder, Level level) {
+                                                         FeignRequestFactory buildTemplateFromArgs, Request.Options options, FeignDecoder decoder,
+                                                         Level level, boolean errorSuppress) {
         return new FeignSyncInvoker(target,
-                client, retryer, requestInterceptors, md, buildTemplateFromArgs, options, decoder, level, exceptionHandler);
+                client, retryer, requestInterceptors, md, buildTemplateFromArgs, options, decoder, level, errorSuppress, exceptionHandler);
     }
 }
