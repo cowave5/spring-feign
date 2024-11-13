@@ -1,21 +1,22 @@
-[![Build Status](https://github.com/cowave5/spring-feign/actions/workflows/maven.yml/badge.svg?branch=master)](https://github.com/cowave5/spring-feign/actions)
-![Static Badge](https://img.shields.io/badge/Java-17-brightgreen)
-![Maven central](https://img.shields.io/badge/maven--central-2.7.4-brightgreen)
+[![Build Status](https://github.com/cowave5/http-client/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/cowave5/http-client/actions)
+![Static Badge](https://img.shields.io/badge/Java-1.8-brightgreen)
+![Maven central](https://img.shields.io/badge/maven--central-2.7.5-brightgreen)
+[![codecov.io](https://codecov.io/github/cowave5/http-client/coverage.svg?branch=master)](https://codecov.io/github/cowave5/http-client?branch=master)
 [![License](https://img.shields.io/badge/license-Apache--2.0-brightgreen)](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
-## spring-feign
+## http-client
 
-一个Http调用客户端，依赖netflix feign实现，方便在spring中声明
+HTTP客户端，参考Netflix Feign实现，使用的Apache Httpclient进行调用
 
 - 依赖
 
 ```xml
 <dependency>
     <groupId>com.cowave.commons</groupId>
-    <artifactId>spring-feign</artifactId>
-    <version>2.7.4</version>
+    <artifactId>http-client</artifactId>
+    <version>2.7.5</version>
 </dependency>
 ```
 
-- 使用说明：[wiki](https://github.com/cowave5/spring-feign/wiki/%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E)
-- 问题建议：[issues](https://github.com/cowave5/spring-feign/issues)
+- 使用说明：[wiki](https://github.com/cowave5/http-client/wiki/%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E)
+- 问题建议：[issues](https://github.com/cowave5/http-client/issues)

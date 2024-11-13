@@ -1,0 +1,14 @@
+server:
+  port: 8443
+  servlet:
+    context-path: /
+  ssl:
+    enabled: true
+    protocol: TLS
+    keyStoreType: JKS
+    keyAlias: test
+    key-store-password: 123456
+    key-store: classpath:ssl.keystore
+
+# keytool -genkey -alias test -keyalg RSA -keystore ssl.keystore
+# CN=shan, OU=cowave, O=cowave, L=nanjing, ST=jiangsu, C=zh
