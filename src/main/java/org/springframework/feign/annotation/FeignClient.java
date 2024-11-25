@@ -29,7 +29,7 @@ public @interface FeignClient {
 	@AliasFor(attribute = "value")
 	String url() default "";
 
-	Level level() default Level.WARN;
+	Level level() default Level.INFO;
 
 	boolean suppressError() default false;
 
