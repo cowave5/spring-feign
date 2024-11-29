@@ -1,6 +1,5 @@
 package org.springframework.feign;
 
-import java.lang.reflect.Constructor;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
@@ -113,25 +112,14 @@ public class FeignManager {
         }
 
         try{
+            // encode / decoder
             builder.encoder(encoder(feign)).decoder(decoder(feign));
             // Https设置
-            Class<?> sslSocketFactoryClass = feign.sslSocketFactory();
-            Class<?> hostnameVerifierClass = feign.hostnameVerifier();
-            if (SSLSocketFactory.class.isAssignableFrom(sslSocketFactoryClass)) {
-                SSLSocketFactory sslSocketFactory;
-                if (StringUtils.hasText(feign.sslCertPath()) && StringUtils.hasText(feign.sslPasswd())) {
-                    Constructor<?> constructor = sslSocketFactoryClass.getConstructor(String.class, String.class);
-                    sslSocketFactory = (SSLSocketFactory) constructor.newInstance(feign.sslCertPath(), feign.sslPasswd());
-                } else {
-                    sslSocketFactory = (SSLSocketFactory) sslSocketFactoryClass.newInstance();
-                }
-
-                if (!HostnameVerifier.class.isAssignableFrom(hostnameVerifierClass)) {
-                    builder.client(new Client.Default(sslSocketFactory, null));
-                } else {
-                    builder.client(new Client.Default(sslSocketFactory, (HostnameVerifier) hostnameVerifierClass.newInstance()));
-                }
-            }
+            Class<? extends SSLSocketFactory> sslSocketFactoryClass = feign.sslSocketFactory();
+            Class<? extends HostnameVerifier> hostnameVerifierClass = feign.hostnameVerifier();
+            SSLSocketFactory SSLSocketFactory = sslSocketFactoryClass.newInstance();
+            HostnameVerifier hostnameVerifier = hostnameVerifierClass.newInstance();
+            builder.client(new Client.Default(SSLSocketFactory, hostnameVerifier));
         }catch(Exception e){
             throw new RuntimeException(e);
         }

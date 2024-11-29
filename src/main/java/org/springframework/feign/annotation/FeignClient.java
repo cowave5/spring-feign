@@ -1,12 +1,15 @@
 package org.springframework.feign.annotation;
 
+import com.cowave.commons.response.ssl.NoopHostnameVerifier;
+import com.cowave.commons.response.ssl.NoopTlsSocketFactory;
 import org.slf4j.event.Level;
 import org.springframework.core.annotation.AliasFor;
-import org.springframework.feign.NULL;
 import org.springframework.feign.codec.EJacksonDecoder;
 import org.springframework.feign.codec.EJacksonEncoder;
 import org.springframework.stereotype.Component;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLSocketFactory;
 import java.lang.annotation.*;
 
 import static java.lang.annotation.ElementType.TYPE;
@@ -39,13 +42,9 @@ public @interface FeignClient {
 
 	Class<?> decoder() default EJacksonDecoder.class;
 
-	Class<?> sslSocketFactory() default NULL.class;
+	Class<? extends SSLSocketFactory> sslSocketFactory() default NoopTlsSocketFactory.class;
 
-	Class<?> hostnameVerifier() default NULL.class;
-
-	String sslPasswd() default "";
-
-	String sslCertPath() default "";
+	Class<? extends HostnameVerifier> hostnameVerifier() default NoopHostnameVerifier.class;
 
 	int connectTimeoutMillis() default 10000;
 
