@@ -15,8 +15,8 @@ import org.slf4j.event.Level;
 import org.springframework.feign.FeignExceptionHandler;
 import org.springframework.feign.codec.FeignDecoder;
 import org.springframework.feign.invoke.method.FeignMethodMetadata;
-import org.springframework.feign.invoke.template.FeignRequestTemplate;
 import org.springframework.feign.invoke.template.FeignRequestFactory;
+import org.springframework.feign.invoke.template.FeignRequestTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StreamUtils;
@@ -107,11 +107,9 @@ public class FeignSyncInvoker implements InvocationHandlerFactory.MethodHandler 
         Response response;
         long start = System.nanoTime();
         try {
-            // http调用
             response = client.execute(request, options);
         } catch (IOException e){
-            long cost = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
-            LOGGER.error(">< {}ms {} {}", cost, e.getMessage(), url);
+            LOGGER.error(">< {} {}", e.getMessage(), url, e);
             return throwOrReturn(httpType, new HttpHintException("{frame.remote.failed}"));
         }
 
@@ -139,9 +137,8 @@ public class FeignSyncInvoker implements InvocationHandlerFactory.MethodHandler 
                 return decoder.decode(response, metadata.returnType(), url, cost, status, level);
             }
 
-            String body = null;
             if (response.body() != null) {
-                body = StreamUtils.copyToString(response.body().asInputStream(), StandardCharsets.UTF_8);
+                String body = StreamUtils.copyToString(response.body().asInputStream(), StandardCharsets.UTF_8);
                 LOGGER.error(">< {} {}ms {} {}", status, cost, url, body);
             }else{
                 LOGGER.error(">< {} {}ms {}", status, cost, url);
@@ -153,7 +150,7 @@ public class FeignSyncInvoker implements InvocationHandlerFactory.MethodHandler 
             }
             return throwOrReturn(httpType, e);
         } catch (Exception e) {
-            LOGGER.error(">< {}ms {} {}", cost, e.getMessage(), url);
+            LOGGER.error(">< {}ms {} {}", cost, e.getMessage(), url, e);
             return throwOrReturn(httpType, new HttpHintException("{frame.remote.failed}", e));
         }
     }
@@ -162,6 +159,7 @@ public class FeignSyncInvoker implements InvocationHandlerFactory.MethodHandler 
         if (errorSuppress && httpType != null) {
             HttpResponse<?> httpResponse = new HttpResponse<>(SERVICE_ERROR);
             httpResponse.setCause(exception);
+            httpResponse.setMessage(exception.getMessage());
             return httpResponse;
         }
         throw exception;
